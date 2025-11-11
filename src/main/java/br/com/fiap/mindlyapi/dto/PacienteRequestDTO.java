@@ -20,8 +20,7 @@ public record PacienteRequestDTO(
 
         @NotBlank(message = "Telefone é obrigatório")
         @Size(max = 20, message = "Telefone deve ter no máximo 20 caracteres")
-        String telefone,
-
-        Integer idade
+        String telefone
+        
 ) {
 }

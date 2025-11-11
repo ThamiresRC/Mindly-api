@@ -16,6 +16,12 @@ public record PsicologoRequestDTO(
 
         @NotBlank(message = "Senha é obrigatória")
         @Size(min = 6, message = "Senha deve ter pelo menos 6 caracteres")
-        String senha
+        String senha,
+
+        @NotBlank(message = "Telefone é obrigatório")
+        @Size(max = 20, message = "Telefone deve ter no máximo 20 caracteres")
+        String telefone
+
+
 ) {
 }

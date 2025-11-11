@@ -28,7 +28,6 @@ public class PacienteController {
         entity.setEmail(dto.email());
         entity.setSenha(dto.senha());
         entity.setTelefone(dto.telefone());
-        entity.setIdade(dto.idade());
         // observacao fica null por enquanto
 
         Paciente salvo = pacienteRepository.save(entity);
@@ -60,7 +59,6 @@ public class PacienteController {
         paciente.setEmail(dto.email());
         paciente.setSenha(dto.senha());
         paciente.setTelefone(dto.telefone());
-        paciente.setIdade(dto.idade());
         // não mexe em observacao aqui
 
         Paciente salvo = pacienteRepository.save(paciente);
@@ -82,7 +80,6 @@ public class PacienteController {
                 p.getNome(),
                 p.getEmail(),
                 p.getTelefone(),
-                p.getIdade(),
                 p.getObservacao() // por enquanto null, até ter endpoint de observação
         );
     }

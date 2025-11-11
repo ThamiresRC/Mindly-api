@@ -35,8 +35,6 @@ public class Paciente {
     @Size(max = 20, message = "Telefone deve ter no máximo 20 caracteres")
     private String telefone;
 
-    private Integer idade;
-
     @Size(max = 500)
     private String observacao;
 }

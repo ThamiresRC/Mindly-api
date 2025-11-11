@@ -5,7 +5,6 @@ public record PacienteResponseDTO(
         String nome,
         String email,
         String telefone,
-        Integer idade,
         String observacao
 ) {
 }
