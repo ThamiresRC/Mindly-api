@@ -8,7 +8,7 @@ import br.com.fiap.mindlyapi.repository.PacienteRepository;
 import br.com.fiap.mindlyapi.repository.RegistroDiarioRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -16,77 +16,107 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/pacientes/{pacienteId}/registros")
+@RequestMapping("/api/registros")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class RegistroDiarioController {
 
-    private final RegistroDiarioRepository registroDiarioRepository;
-    private final PacienteRepository pacienteRepository;
+    private final RegistroDiarioRepository registroRepo;
+    private final PacienteRepository pacienteRepo;
 
-    // CREATE - registrar o dia do paciente
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public RegistroDiarioResponseDTO criar(@PathVariable Long pacienteId,
-                                           @RequestBody @Valid RegistroDiarioRequestDTO dto) {
+    public ResponseEntity<RegistroDiarioResponseDTO> criar(
+            @RequestBody @Valid RegistroDiarioRequestDTO dto
+    ) {
+        Paciente paciente = pacienteRepo.findByEmail(dto.emailPaciente())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Paciente não encontrado para o e-mail informado."
+                ));
 
-        Paciente paciente = pacienteRepository.findById(pacienteId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Paciente não encontrado"));
+        LocalDate data = (dto.dataRegistro() != null && !dto.dataRegistro().isBlank())
+                ? LocalDate.parse(dto.dataRegistro())
+                : LocalDate.now();
 
-        RegistroDiario entity = new RegistroDiario();
-        entity.setPaciente(paciente);
-        entity.setData(dto.data() != null ? dto.data() : LocalDate.now());
-        entity.setEmocao(dto.emocao());
-        entity.setComeuBem(dto.comeuBem());
-        entity.setDormiuBem(dto.dormiuBem());
-        entity.setRelatoDoDia(dto.relatoDoDia());
-        entity.setDesabafo(dto.desabafo());
+        RegistroDiario registro = RegistroDiario.builder()
+                .dataRegistro(data)
+                .descricaoDia(dto.descricaoDia())
+                .moodDoDia(dto.moodDoDia())
+                .nivelEstresse(dto.nivelEstresse())
+                .qualidadeSono(dto.qualidadeSono())
+                .atividadeFisica(dto.atividadeFisica())
+                .motivoGratidao(dto.motivoGratidao())
+                .paciente(paciente)
+                .build();
 
-        RegistroDiario salvo = registroDiarioRepository.save(entity);
-        return toResponse(salvo);
+        RegistroDiario salvo = registroRepo.save(registro);
+        return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(salvo));
     }
 
-    // READ - listar registros do paciente (mais recentes primeiro)
-    @GetMapping
-    public List<RegistroDiarioResponseDTO> listar(@PathVariable Long pacienteId) {
-        if (!pacienteRepository.existsById(pacienteId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Paciente não encontrado");
-        }
-
-        return registroDiarioRepository.findByPacienteIdOrderByDataDesc(pacienteId)
+    @GetMapping("/paciente/{email}")
+    public List<RegistroDiarioResponseDTO> listarPorPaciente(@PathVariable String email) {
+        return registroRepo.findByPacienteEmailOrderByDataRegistroDesc(email)
                 .stream()
                 .map(this::toResponse)
                 .toList();
     }
 
-    // (Opcional) buscar um registro específico
-    @GetMapping("/{registroId}")
-    public RegistroDiarioResponseDTO buscarPorId(@PathVariable Long pacienteId,
-                                                 @PathVariable Long registroId) {
-        RegistroDiario registro = registroDiarioRepository.findById(registroId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Registro não encontrado"));
+    @PutMapping("/{id}")
+    public ResponseEntity<RegistroDiarioResponseDTO> atualizar(
+            @PathVariable Long id,
+            @RequestBody RegistroDiarioRequestDTO dto
+    ) {
+        RegistroDiario registro = registroRepo.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Registro não encontrado."
+                ));
 
-        if (!registro.getPaciente().getId().equals(pacienteId)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Registro não pertence a este paciente");
+        if (dto.dataRegistro() != null && !dto.dataRegistro().isBlank()) {
+            registro.setDataRegistro(LocalDate.parse(dto.dataRegistro()));
+        }
+        if (dto.descricaoDia() != null) {
+            registro.setDescricaoDia(dto.descricaoDia());
+        }
+        if (dto.moodDoDia() != null) {
+            registro.setMoodDoDia(dto.moodDoDia());
+        }
+        if (dto.nivelEstresse() != null) {
+            registro.setNivelEstresse(dto.nivelEstresse());
+        }
+        if (dto.qualidadeSono() != null) {
+            registro.setQualidadeSono(dto.qualidadeSono());
+        }
+        if (dto.atividadeFisica() != null) {
+            registro.setAtividadeFisica(dto.atividadeFisica());
+        }
+        if (dto.motivoGratidao() != null) {
+            registro.setMotivoGratidao(dto.motivoGratidao());
         }
 
-        return toResponse(registro);
+        RegistroDiario atualizado = registroRepo.save(registro);
+        return ResponseEntity.ok(toResponse(atualizado));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable Long id) {
+        if (!registroRepo.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Registro não encontrado.");
+        }
+        registroRepo.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 
     private RegistroDiarioResponseDTO toResponse(RegistroDiario r) {
-        boolean alerta = r.getDesabafo() != null &&
-                r.getDesabafo().toLowerCase().contains("matar");
-
         return new RegistroDiarioResponseDTO(
                 r.getId(),
-                r.getPaciente().getId(),
-                r.getData(),
-                r.getEmocao(),
-                r.getComeuBem(),
-                r.getDormiuBem(),
-                r.getRelatoDoDia(),
-                r.getDesabafo(),
-                alerta
+                r.getDataRegistro(),
+                r.getDescricaoDia(),
+                r.getMoodDoDia(),
+                r.getNivelEstresse(),
+                r.getQualidadeSono(),
+                r.getAtividadeFisica(),
+                r.getMotivoGratidao()
         );
     }
 }

@@ -28,7 +28,6 @@ public class PacienteController {
         entity.setEmail(dto.email());
         entity.setSenha(dto.senha());
         entity.setTelefone(dto.telefone());
-        // observacao fica null por enquanto
 
         Paciente salvo = pacienteRepository.save(entity);
         return toResponse(salvo);
@@ -51,7 +50,7 @@ public class PacienteController {
 
     @PutMapping("/{id}")
     public PacienteResponseDTO atualizar(@PathVariable Long id,
-                                         @RequestBody @Valid PacienteRequestDTO dto) {
+            @RequestBody @Valid PacienteRequestDTO dto) {
         Paciente paciente = pacienteRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Paciente não encontrado"));
 
@@ -59,7 +58,6 @@ public class PacienteController {
         paciente.setEmail(dto.email());
         paciente.setSenha(dto.senha());
         paciente.setTelefone(dto.telefone());
-        // não mexe em observacao aqui
 
         Paciente salvo = pacienteRepository.save(paciente);
         return toResponse(salvo);
@@ -80,7 +78,6 @@ public class PacienteController {
                 p.getNome(),
                 p.getEmail(),
                 p.getTelefone(),
-                p.getObservacao() // por enquanto null, até ter endpoint de observação
-        );
+                p.getObservacao());
     }
 }

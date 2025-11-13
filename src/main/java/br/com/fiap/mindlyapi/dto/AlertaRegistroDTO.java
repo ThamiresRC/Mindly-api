@@ -4,7 +4,6 @@ public record AlertaRegistroDTO(
         Long pacienteId,
         String pacienteNome,
         String telefone,
-        String emocao,
-        String desabafo
-) {
-}
+        String moodDia,
+        String descricaoDia
+) {}

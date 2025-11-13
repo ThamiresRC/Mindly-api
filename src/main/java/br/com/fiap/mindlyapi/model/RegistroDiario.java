@@ -1,8 +1,6 @@
 package br.com.fiap.mindlyapi.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -19,23 +17,22 @@ public class RegistroDiario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
-    private LocalDate data; // dia do registro
+    private LocalDate dataRegistro;
 
-    @Enumerated(EnumType.STRING)
-    @NotNull
-    private Emocao emocao; // emoção principal
+    @Column(length = 500, nullable = false)
+    private String descricaoDia;
 
-    private Boolean comeuBem;
-    private Boolean dormiuBem;
+    @Column(length = 100)
+    private String moodDoDia;
 
-    @Size(max = 2000)
-    private String relatoDoDia;
+    private Integer nivelEstresse;
+    private Integer qualidadeSono;
+    private Boolean atividadeFisica;
 
-    @Size(max = 2000)
-    private String desabafo; // onde vamos ler "matar" futuramente
+    @Column(length = 255)
+    private String motivoGratidao;
 
-    @ManyToOne(optional = false)
+    @ManyToOne
     @JoinColumn(name = "paciente_id")
     private Paciente paciente;
 }

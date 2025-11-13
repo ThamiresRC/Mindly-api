@@ -30,4 +30,8 @@ public class Psicologo {
     @NotBlank(message = "Senha é obrigatória")
     @Size(min = 6, message = "Senha deve ter pelo menos 6 caracteres")
     private String senha;
+
+    @NotBlank(message = "Telefone é obrigatório")
+    @Size(max = 20)
+    private String telefone;
 }

@@ -30,6 +30,7 @@ public class PsicologoController {
         p.setNome(dto.nome());
         p.setEmail(dto.email());
         p.setSenha(dto.senha());
+        p.setTelefone(dto.telefone());
 
         Psicologo salvo = psicologoRepository.save(p);
         return toResponse(salvo);
@@ -50,20 +51,18 @@ public class PsicologoController {
         return toResponse(p);
     }
 
-    // 🔔 Listar registros com alerta (desabafo contendo "matar")
     @GetMapping("/alertas")
     public List<AlertaRegistroDTO> listarRegistrosComAlerta() {
         return registroDiarioRepository.findAll()
                 .stream()
-                .filter(r -> r.getDesabafo() != null &&
-                        r.getDesabafo().toLowerCase().contains("matar"))
+                .filter(r -> r.getDescricaoDia() != null &&
+                        r.getDescricaoDia().toLowerCase().contains("matar"))
                 .map(r -> new AlertaRegistroDTO(
                         r.getPaciente().getId(),
                         r.getPaciente().getNome(),
                         r.getPaciente().getTelefone(),
-                        r.getEmocao().toString(),
-                        r.getDesabafo()
-                ))
+                        r.getMoodDoDia(),
+                        r.getDescricaoDia()))
                 .toList();
     }
 
@@ -71,7 +70,6 @@ public class PsicologoController {
         return new PsicologoResponseDTO(
                 p.getId(),
                 p.getNome(),
-                p.getEmail()
-        );
+                p.getEmail());
     }
 }
