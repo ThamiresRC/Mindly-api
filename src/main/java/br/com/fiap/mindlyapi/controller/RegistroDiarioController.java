@@ -1,5 +1,6 @@
 package br.com.fiap.mindlyapi.controller;
 
+import br.com.fiap.mindlyapi.dto.AlertaRegistroDTO;
 import br.com.fiap.mindlyapi.dto.RegistroDiarioRequestDTO;
 import br.com.fiap.mindlyapi.dto.RegistroDiarioResponseDTO;
 import br.com.fiap.mindlyapi.model.Paciente;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/registros")
@@ -105,6 +106,68 @@ public class RegistroDiarioController {
         }
         registroRepo.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/alertas")
+    public List<AlertaRegistroDTO> listarAlertasCriticos() {
+        List<RegistroDiario> todos = registroRepo.findAll();
+
+        Map<Long, AlertaRegistroDTO> alertaPorPaciente = new LinkedHashMap<>();
+
+        for (RegistroDiario r : todos) {
+            if (!contemPalavrasDeRisco(r.getDescricaoDia())) {
+                continue;
+            }
+
+            Paciente p = r.getPaciente();
+            if (p == null) continue;
+
+            Long pacienteId = p.getId();
+            // Garante 1 alerta por paciente
+            if (!alertaPorPaciente.containsKey(pacienteId)) {
+                alertaPorPaciente.put(
+                        pacienteId,
+                        new AlertaRegistroDTO(
+                                pacienteId,
+                                p.getNome(),
+                                p.getTelefone(),
+                                r.getMoodDoDia(),
+                                r.getDescricaoDia()
+                        )
+                );
+            }
+        }
+
+        return new ArrayList<>(alertaPorPaciente.values());
+    }
+
+    private boolean contemPalavrasDeRisco(String descricao) {
+        if (descricao == null || descricao.isBlank()) return false;
+
+        String texto = descricao.toLowerCase();
+
+        String[] riscos = new String[]{
+                "suicidio",
+                "suicídio",
+                "me matar",
+                "me matar.",
+                "quero morrer",
+                "quero morrer.",
+                "não quero mais viver",
+                "nao quero mais viver",
+                "tirar minha vida",
+                "acabar com tudo",
+                "acabar com a minha vida",
+                "morrer",
+                "morte"
+        };
+
+        for (String palavra : riscos) {
+            if (texto.contains(palavra)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private RegistroDiarioResponseDTO toResponse(RegistroDiario r) {

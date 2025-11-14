@@ -1,5 +1,6 @@
 package br.com.fiap.mindlyapi.controller;
 
+import br.com.fiap.mindlyapi.dto.FeedbackRequestDTO;
 import br.com.fiap.mindlyapi.dto.PacienteRequestDTO;
 import br.com.fiap.mindlyapi.dto.PacienteResponseDTO;
 import br.com.fiap.mindlyapi.model.Paciente;
@@ -48,9 +49,17 @@ public class PacienteController {
         return toResponse(paciente);
     }
 
+
+    @GetMapping("/email/{email}")
+    public PacienteResponseDTO buscarPorEmail(@PathVariable String email) {
+        Paciente paciente = pacienteRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Paciente não encontrado"));
+        return toResponse(paciente);
+    }
+
     @PutMapping("/{id}")
     public PacienteResponseDTO atualizar(@PathVariable Long id,
-            @RequestBody @Valid PacienteRequestDTO dto) {
+                                         @RequestBody @Valid PacienteRequestDTO dto) {
         Paciente paciente = pacienteRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Paciente não encontrado"));
 
@@ -60,6 +69,20 @@ public class PacienteController {
         paciente.setTelefone(dto.telefone());
 
         Paciente salvo = pacienteRepository.save(paciente);
+        return toResponse(salvo);
+    }
+
+    @PutMapping("/email/{email}/feedback")
+    public PacienteResponseDTO salvarFeedback(
+            @PathVariable String email,
+            @RequestBody FeedbackRequestDTO dto
+    ) {
+        Paciente paciente = pacienteRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Paciente não encontrado"));
+
+        paciente.setObservacao(dto.feedback());
+        Paciente salvo = pacienteRepository.save(paciente);
+
         return toResponse(salvo);
     }
 
@@ -78,6 +101,7 @@ public class PacienteController {
                 p.getNome(),
                 p.getEmail(),
                 p.getTelefone(),
-                p.getObservacao());
+                p.getObservacao()
+        );
     }
 }
