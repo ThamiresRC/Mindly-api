@@ -1,4 +1,4 @@
-# 🧠 Mindly — Sprint (Java Advanced)
+# 🧠 Mindly — Global Solution (Java Advanced)
 
 ## 📘 Descrição do Projeto
 O Mindly é uma aplicação completa desenvolvida em Java Spring Boot, com foco em saúde mental, autoavaliação e apoio psicológico.
