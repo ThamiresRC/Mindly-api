@@ -27,7 +27,9 @@ public class RegistroDiario {
 
     private Integer nivelEstresse;
     private Integer qualidadeSono;
-    private Boolean atividadeFisica;
+
+    @Column(length = 50)
+    private String atividadeFisica;
 
     @Column(length = 255)
     private String motivoGratidao;

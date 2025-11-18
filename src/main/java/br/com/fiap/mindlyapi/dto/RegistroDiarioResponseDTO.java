@@ -9,6 +9,6 @@ public record RegistroDiarioResponseDTO(
         String moodDoDia,
         Integer nivelEstresse,
         Integer qualidadeSono,
-        Boolean atividadeFisica,
+        String atividadeFisica,
         String motivoGratidao
 ) {}

@@ -1,12 +1,14 @@
 package br.com.fiap.mindlyapi.service;
 
 import br.com.fiap.mindlyapi.dto.PacienteRequestDTO;
-import br.com.fiap.mindlyapi.dto.PacienteResponseDTO;
+import br.com.fiap.mindlyapi.dto.TokenResponseDTO;
 import br.com.fiap.mindlyapi.model.Paciente;
 import br.com.fiap.mindlyapi.model.Psicologo;
 import br.com.fiap.mindlyapi.repository.PacienteRepository;
 import br.com.fiap.mindlyapi.repository.PsicologoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,36 +17,21 @@ public class AuthService {
 
     private final PacienteRepository pacienteRepository;
     private final PsicologoRepository psicologoRepository;
+    private final TokenService tokenService;
+    private final MessageSource messageSource;
 
-    private static final String ADMIN_EMAIL = "admin@mindly.com";
+    private String msg(String code) {
+        return messageSource.getMessage(code, null, LocaleContextHolder.getLocale());
+    }
 
-    public PacienteResponseDTO register(PacienteRequestDTO dto) {
+    public TokenResponseDTO register(PacienteRequestDTO dto) {
 
         boolean emailJaCadastrado =
-                pacienteRepository.findByEmail(dto.email()).isPresent()
-                        || psicologoRepository.findByEmail(dto.email()).isPresent();
+                pacienteRepository.existsByEmail(dto.email())
+                        || psicologoRepository.existsByEmail(dto.email());
 
         if (emailJaCadastrado) {
-            throw new IllegalArgumentException("Já existe um usuário cadastrado com esse e-mail.");
-        }
-
-        if (ADMIN_EMAIL.equalsIgnoreCase(dto.email())) {
-            Psicologo psicologo = Psicologo.builder()
-                    .nome(dto.nome())
-                    .email(dto.email())
-                    .senha(dto.senha())
-                    .telefone(dto.telefone())
-                    .build();
-
-            Psicologo saved = psicologoRepository.save(psicologo);
-
-            return new PacienteResponseDTO(
-                    saved.getId(),
-                    saved.getNome(),
-                    saved.getEmail(),
-                    saved.getTelefone(),
-                    null
-            );
+            throw new IllegalArgumentException(msg("paciente.email.ja.cadastrado"));
         }
 
         Paciente paciente = Paciente.builder()
@@ -55,48 +42,48 @@ public class AuthService {
                 .build();
 
         Paciente saved = pacienteRepository.save(paciente);
+        String token = tokenService.gerarToken(saved.getEmail());
 
-        return new PacienteResponseDTO(
-                saved.getId(),
+        return new TokenResponseDTO(
                 saved.getNome(),
                 saved.getEmail(),
-                saved.getTelefone(),
-                saved.getObservacao()
+                "PACIENTE",
+                token
         );
     }
 
-    public PacienteResponseDTO login(String email, String senha) {
+    public TokenResponseDTO login(String email, String senha) {
 
-        if (ADMIN_EMAIL.equalsIgnoreCase(email)) {
-            Psicologo psicologo = psicologoRepository.findByEmail(email)
-                    .orElseThrow(() -> new IllegalArgumentException("E-mail ou senha inválidos."));
-
-            if (!psicologo.getSenha().equals(senha)) {
-                throw new IllegalArgumentException("E-mail ou senha inválidos.");
+        Paciente paciente = pacienteRepository.findByEmail(email).orElse(null);
+        if (paciente != null) {
+            if (!paciente.getSenha().equals(senha)) {
+                throw new IllegalArgumentException(msg("auth.credenciais.invalidas"));
             }
 
-            return new PacienteResponseDTO(
-                    psicologo.getId(),
-                    psicologo.getNome(),
-                    psicologo.getEmail(),
-                    psicologo.getTelefone(),
-                    null
+            String token = tokenService.gerarToken(paciente.getEmail());
+            return new TokenResponseDTO(
+                    paciente.getNome(),
+                    paciente.getEmail(),
+                    "PACIENTE",
+                    token
             );
         }
 
-        Paciente paciente = pacienteRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("E-mail ou senha inválidos."));
+        Psicologo psicologo = psicologoRepository.findByEmail(email).orElse(null);
+        if (psicologo != null) {
+            if (!psicologo.getSenha().equals(senha)) {
+                throw new IllegalArgumentException(msg("auth.credenciais.invalidas"));
+            }
 
-        if (!paciente.getSenha().equals(senha)) {
-            throw new IllegalArgumentException("E-mail ou senha inválidos.");
+            String token = tokenService.gerarToken(psicologo.getEmail());
+            return new TokenResponseDTO(
+                    psicologo.getNome(),
+                    psicologo.getEmail(),
+                    "PSICOLOGO",
+                    token
+            );
         }
 
-        return new PacienteResponseDTO(
-                paciente.getId(),
-                paciente.getNome(),
-                paciente.getEmail(),
-                paciente.getTelefone(),
-                paciente.getObservacao()
-        );
+        throw new IllegalArgumentException(msg("auth.credenciais.invalidas"));
     }
 }
