@@ -1,75 +1,88 @@
 # 🧠 Mindly — Global Solution (Java Advanced)
 
 ## 📘 Descrição do Projeto
-O Mindly é uma aplicação completa desenvolvida em Java Spring Boot, com foco em saúde mental, autoavaliação e apoio psicológico.
+O **Mindly** é uma plataforma completa de apoio psicológico, construída em **Java Spring Boot**, que integra pacientes e psicólogos por meio de registros diários, análise emocional e ferramentas de autocuidado assistidas por **Inteligência Artificial (Spring AI + Groq)**.
 
-A plataforma permite que pacientes registrem suas emoções, rotinas e bem-estar diariamente, enquanto psicólogos acompanham a evolução por meio de um painel profissional, com feedbacks, histórico e padrões emocionais.
-
-A proposta busca oferecer uma solução acessível, moderna e multidisciplinar, integrando tecnologia com práticas de saúde mental — alinhada às necessidades reais de pacientes, incluindo pessoas com autismo, TDAH e transtornos de ansiedade..
+A aplicação permite que pacientes registrem emoções, hábitos e rotinas enquanto psicólogos acompanham a evolução e emitem feedbacks. A solução é pensada especialmente para torná‑la acessível, contínua e acolhedora — considerando também necessidades reais de pessoas com **autismo, TDAH, ansiedade e depressão**.
 
 ---
 
 ## 🎯 Objetivos da Solução
-- Auxiliar pacientes no **registro diário de emoções** e bem-estar.
-- Facilitar o acompanhamento profissional por psicólogos.
-- Identificar padrões emocionais e alertas críticos automaticamente.
-- Tornar o cuidado psicológico mais acessível e contínuo.
-- Fornecer uma solução moderna e escalável com **Spring Boot + JWT + PostgreSQL**.
-- Integrar o Mindly ao app mobile (React Native).
+- Registrar e acompanhar o **bem-estar emocional diário**.
+- Facilitar o acompanhamento psicológico profissional.
+- Gerar **alertas críticos automáticos** com base em padrões emocionais.
+- Fornecer sugestões de autocuidado usando **IA Generativa (Groq Llama 3.1)**.
+- Integrar backend + mobile (React Native).
+- Criar uma solução moderna, segura e escalável para o ecossistema FIAP.
 
 ---
 
 ## 🧠 Tecnologias Utilizadas
-| Tecnologia                        | Uso |
-|-----------------------------------|-----|
-| **Java 17**                       | Linguagem principal |
-| **Spring Boot 3.5.7**             | Framework de backend |
-| **Spring Security + JWT (Auth0)** | Autenticação e autorização |
-| **Spring Data JPA / Hibernate**   | Persistência |
-| **H2 / Oracle**                   | Banco de dados local e acadêmico |
-| **RabbitMQ (AMQP)**               | Mensageria e alertas assíncronos |
-| **Swagger (Springdoc)**           | Documentação da API |
-| **Lombok**                        | Redução de boilerplate |
-| **React Native**                  | Aplicativo mobile |
-| **Docker**                        | Containerização (opcional) |
+| Tecnologia | Uso |
+|-----------|-----|
+| **Java 17** | Linguagem principal |
+| **Spring Boot 3.5.7** | Framework backend |
+| **Spring Security + JWT (Auth0)** | Autenticação |
+| **Spring Data JPA / Hibernate** | Persistência |
+| **Oracle / H2** | Banco de dados |
+| **RabbitMQ (AMQP)** | Mensageria |
+| **Spring AI + Groq** | IA Generativa |
+| **Swagger / Springdoc** | Documentação da API |
+| **Lombok** | Redução de código repetitivo |
+| **Docker** | Containerização |
+| **React Native** | Aplicativo mobile |
+
+---
+
+## 🤖 IA Generativa Integrada (Spring AI + Groq)
+A API conta com um módulo de Inteligência Artificial que:
+- Gera **sugestões de autocuidado** para o paciente.
+- Analisa texto emocional enviado no registro diário.
+- Utiliza o modelo **Llama 3.1 8B Instant**, rápido e gratuito via Groq.
+
+Endpoint:
+```
+POST /api/ia/sugestoes
+```
 
 ---
 
 ## ⚙️ Funcionalidades Principais
 
-### 👤 Perfil Paciente
-- Registro diário com:
-    - Emoção do dia
-    - Nível de estresse
-    - Qualidade do sono
-    - Atividade física
-    - Motivo de gratidão
-- Histórico completo e filtrável.
+### 👤 Paciente
+- Registro diário contendo:
+  - Emoção principal
+  - Nível de estresse
+  - Qualidade do sono
+  - Atividade física
+  - Motivo de gratidão
+- Histórico completo.
 - Feedback do psicólogo.
-- Login com JWT.
+- Sugestões de autocuidado via IA.
+- Login via JWT.
 
-### 🧑‍⚕️ Perfil Psicólogo
-- Listagem e acompanhamento dos pacientes.
-- Visualização completa dos registros.
-- Envio de feedback para cada registro.
-- Painel dedicado com estatísticas (em expansão).
-- Acesso a **alertas críticos**.
+### 🧑‍⚕️ Psicólogo
+- Lista e gerencia pacientes.
+- Visualiza registros detalhados.
+- Envia feedbacks.
+- Recebe alertas críticos.
+- Acompanha evolução emocional.
 
 ### 🚨 Sistema de Alertas
-Gera alerta automático quando:
-- O humor está em estado crítico.
-- O paciente usa palavras de risco (“triste”, “desesperado”, “ansiedade forte”, “quero sumir”…).
+Dispara alerta quando:
+- Emoção crítica é registrada.
+- Palavras de risco são identificadas.
 - Estresse muito elevado.
 
-Alertas são enviados via **fila RabbitMQ** para processamento assíncrono.
+Alertas são enviados para filas **RabbitMQ**.
 
 ---
 
 ## ☁️ Deploy e Ambientes
 | Ambiente | URL | Observações |
 |----------|-----|-------------|
-| **Local** | http://localhost:8080/swagger-ui.html | Ambiente de desenvolvimento |
-| **Produção (opcional)** | Render / Railway | Pode ser facilmente publicado |
+| **Local** | http://localhost:8080/swagger-ui.html | Desenvolvimento |
+| **Produção (opcional)** | Render / Railway | Pode ser publicado facilmente |
 
 ---
 
@@ -85,6 +98,7 @@ mindly-api/
  ├── service/
  ├── MessagingConfig.java
  ├── AlertMessagingService.java
+ ├── AiSugestaoService.java
  ├── application.properties
 ```
 
@@ -93,41 +107,44 @@ mindly-api/
 ## 🧾 Endpoints Principais
 
 ### 🔐 Autenticação
-- `POST /api/auth/login` — Login com JWT
+- POST `/api/auth/login`
 
-### 📘 Registros diários
-- `POST /api/registros` — Criar registro
-- `GET /api/registros/paciente/{email}` — Listar registros por paciente
-- `PUT /api/registros/{id}` — Atualizar
-- `DELETE /api/registros/{id}` — Excluir
-- `GET /api/registros/alertas` — Psicólogo vê alertas críticos
+### 📘 Registros Diários
+- POST `/api/registros`
+- GET `/api/registros/paciente/{email}`
+- PUT `/api/registros/{id}`
+- DELETE `/api/registros/{id}`
+- GET `/api/registros/alertas`
+
+### 🤖 Inteligência Artificial
+- POST `/api/ia/sugestoes`
 
 ---
 
 ## 🧩 Integração Multidisciplinar
 | Disciplina | Aplicação |
 |-----------|-----------|
-| **Java Advanced** | API completa com JWT, JPA, validação e mensageria |
-| **Banco de Dados** | Scripts Oracle + H2, modelagem relacional |
+| **Java Advanced** | API completa com IA, JWT, JPA, mensageria |
+| **Banco de Dados** | Modelagem + Oracle SQL |
 | **Mobile** | App React Native consumindo a API |
-| **DevOps** | Deploy possível via Render / Docker |
-| **QA** | Testes via Swagger e Postman |
+| **DevOps** | Possível deploy com Docker e Render |
+| **QA** | Testes via Swagger/Postman |
 
 ---
 
 ## 👩‍💻 Equipe
 | Integrante | RM | Github |
-|-------------|----|---------|
-| **Thamires Ribeiro Cruz** | 558128 | [github.com/ThamiresRC](https://github.com/ThamiresRC) |
-| **Adonay Rodrigues da Rocha** | 558782 | [github.com/AdonayRocha](https://github.com/AdonayRocha) |
-| **Pedro Henrique Martins dos Reis** | 555306 | [github.com/pxxmdr](https://github.com/pxxmdr) |
+|-----------|----|--------|
+| **Thamires Ribeiro Cruz** | 558128 | https://github.com/ThamiresRC |
+| **Adonay Rodrigues da Rocha** | 558782 | https://github.com/AdonayRocha |
+| **Pedro Henrique Martins dos Reis** | 555306 | https://github.com/pxxmdr |
 
 ---
 
 ## 📎 Repositório
-➡️ https://github.com/ThamiresRC/mindly-api
+🔗 https://github.com/ThamiresRC/mindly-api
 
 ---
 
 ## 📅 FIAP — 2º Ano | Java Advanced
-Aplicação desenvolvida para estudos de **saúde mental assistida por tecnologia**.
+Projeto acadêmico baseado em **saúde mental, tecnologia e acessibilidade**, integrando várias disciplinas em uma única solução profissional.
