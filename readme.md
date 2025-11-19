@@ -87,7 +87,7 @@ Alertas são enviados para filas **RabbitMQ**.
 ---
 
 ## 📂 Estrutura do Projeto
-```text
+```
 mindly-api/
 ├── src/
 │   └── main/
@@ -105,9 +105,11 @@ mindly-api/
 │       └── resources/
 │           ├── application.properties
 │           ├── data.sql
-│           └── messages.properties
+│           └── messages.properties (Resource Bundle 'messages')
 ├── pom.xml
 └── readme.md
+
+```
 
 ---
 
