@@ -87,20 +87,27 @@ Alertas são enviados para filas **RabbitMQ**.
 ---
 
 ## 📂 Estrutura do Projeto
-```
+```text
 mindly-api/
- ├── config/
- ├── controller/
- ├── dto/
- ├── model/
- ├── repository/
- ├── security/
- ├── service/
- ├── MessagingConfig.java
- ├── AlertMessagingService.java
- ├── AiSugestaoService.java
- ├── application.properties
-```
+├── src/
+│   └── main/
+│       ├── java/
+│       │   └── br/com/fiap/mindlyapi/
+│       │       ├── config/
+│       │       ├── controller/
+│       │       ├── dto/
+│       │       ├── exception/
+│       │       ├── model/
+│       │       ├── repository/
+│       │       ├── security/
+│       │       ├── service/
+│       │       └── MindlyApiApplication.java
+│       └── resources/
+│           ├── application.properties
+│           ├── data.sql
+│           └── messages.properties
+├── pom.xml
+└── readme.md
 
 ---
 
