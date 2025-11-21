@@ -52,6 +52,8 @@ public class RegistroDiarioController {
         return messageSource.getMessage(code, null, LocaleContextHolder.getLocale());
     }
 
+
+
     @Operation(
             summary = "Criar registro diário",
             description = "Cria um novo registro diário associado a um paciente, identificado por e-mail."
@@ -110,6 +112,7 @@ public class RegistroDiarioController {
         return toResponse(salvo);
     }
 
+
     @Operation(
             summary = "Listar registros de um paciente",
             description = "Retorna uma lista paginada de registros diários de um paciente, ordenados por data decrescente."
@@ -134,6 +137,7 @@ public class RegistroDiarioController {
                 .findByPacienteEmailOrderByDataRegistroDesc(email, pageable)
                 .map(this::toResponse);
     }
+
 
     @Operation(
             summary = "Atualizar registro diário",
@@ -192,6 +196,7 @@ public class RegistroDiarioController {
         return toResponse(atualizado);
     }
 
+
     @Operation(
             summary = "Excluir registro diário",
             description = "Remove um registro diário pelo seu ID."
@@ -221,6 +226,8 @@ public class RegistroDiarioController {
         registroRepo.deleteById(id);
     }
 
+
+
     @Operation(
             summary = "Listar alertas críticos",
             description = "Retorna alertas críticos consolidados por paciente, " +
@@ -233,7 +240,8 @@ public class RegistroDiarioController {
     @PreAuthorize("hasRole('PSICOLOGO')")
     @GetMapping("/alertas")
     public List<AlertaRegistroDTO> listarAlertasCriticos() {
-        return registroRepo.findRegistrosEmAlerta().stream()
+        return registroRepo.findAll().stream()
+                .filter(this::isRegistroCritico)
                 .map(r -> {
                     var paciente = r.getPaciente();
                     return new AlertaRegistroDTO(
@@ -247,13 +255,22 @@ public class RegistroDiarioController {
                 .toList();
     }
 
+
     private boolean isRegistroCritico(RegistroDiario r) {
-        String desc = r.getDescricaoDia();
+        String texto = (r.getDescricaoDia() == null ? "" : r.getDescricaoDia()).toLowerCase();
         Integer nivelEstresse = r.getNivelEstresse();
 
-        boolean textoCritico = desc != null && desc.toLowerCase()
-                .matches(".*(morrer|não aguento|nao aguento|me matar|tirar minha vida).*");
-        boolean estresseAlto = (nivelEstresse != null && nivelEstresse >= 8);
+        boolean textoCritico =
+                texto.contains("tirar a minha vida") ||
+                        texto.contains("tirar minha vida") ||
+                        texto.contains("acabar com a minha vida") ||
+                        texto.contains("me matar") ||
+                        texto.contains("não aguento mais") ||
+                        texto.contains("nao aguento mais") ||
+                        texto.contains("suicid") ||
+                        texto.contains("morrer");
+
+        boolean estresseAlto = (nivelEstresse != null && nivelEstresse >= 4);
 
         return textoCritico || estresseAlto;
     }
