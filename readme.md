@@ -136,7 +136,7 @@ mindly-api/
 | **Java Advanced** | API completa com IA, JWT, JPA, mensageria |
 | **Banco de Dados** | Modelagem + Oracle SQL |
 | **Mobile** | App React Native consumindo a API |
-| **DevOps** | Possível deploy com Docker e Render |
+| **DevOps** | Pipelines CI/CD + Testes |
 | **QA** | Testes via Swagger/Postman |
 
 ---
