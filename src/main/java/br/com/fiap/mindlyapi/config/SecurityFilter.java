@@ -1,7 +1,5 @@
 package br.com.fiap.mindlyapi.config;
 
-import br.com.fiap.mindlyapi.repository.PacienteRepository;
-import br.com.fiap.mindlyapi.repository.PsicologoRepository;
 import br.com.fiap.mindlyapi.service.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -10,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -22,8 +21,6 @@ import java.util.List;
 public class SecurityFilter extends OncePerRequestFilter {
 
     private final TokenService tokenService;
-    private final PacienteRepository pacienteRepository;
-    private final PsicologoRepository psicologoRepository;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
@@ -47,35 +44,21 @@ public class SecurityFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
 
-            try {
-                String email = tokenService.validarToken(token);
+            String email = tokenService.validarToken(token);
+            String role = tokenService.extrairRole(token);
 
-                if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (email != null && role != null
+                    && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                    var pacienteOpt = pacienteRepository.findByEmail(email);
+                String authority = "ROLE_" + role.toUpperCase();
 
-                    if (pacienteOpt.isPresent()) {
-                        var auth = new UsernamePasswordAuthenticationToken(
-                                pacienteOpt.get(),
-                                null,
-                                List.of()
-                        );
-                        SecurityContextHolder.getContext().setAuthentication(auth);
-                    } else {
-                        var psicologoOpt = psicologoRepository.findByEmail(email);
-                        if (psicologoOpt.isPresent()) {
-                            var auth = new UsernamePasswordAuthenticationToken(
-                                    psicologoOpt.get(),
-                                    null,
-                                    List.of()
-                            );
-                            SecurityContextHolder.getContext().setAuthentication(auth);
-                        }
-                    }
-                }
+                var auth = new UsernamePasswordAuthenticationToken(
+                        email,               // principal simples (e-mail)
+                        null,
+                        List.of(new SimpleGrantedAuthority(authority))
+                );
 
-            } catch (Exception e) {
-                SecurityContextHolder.clearContext();
+                SecurityContextHolder.getContext().setAuthentication(auth);
             }
         }
 

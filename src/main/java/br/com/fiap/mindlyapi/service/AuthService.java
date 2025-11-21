@@ -42,7 +42,8 @@ public class AuthService {
                 .build();
 
         Paciente saved = pacienteRepository.save(paciente);
-        String token = tokenService.gerarToken(saved.getEmail());
+
+        String token = tokenService.gerarToken(saved.getEmail(), "PACIENTE");
 
         return new TokenResponseDTO(
                 saved.getNome(),
@@ -60,7 +61,7 @@ public class AuthService {
                 throw new IllegalArgumentException(msg("auth.credenciais.invalidas"));
             }
 
-            String token = tokenService.gerarToken(paciente.getEmail());
+            String token = tokenService.gerarToken(paciente.getEmail(), "PACIENTE");
             return new TokenResponseDTO(
                     paciente.getNome(),
                     paciente.getEmail(),
@@ -75,7 +76,7 @@ public class AuthService {
                 throw new IllegalArgumentException(msg("auth.credenciais.invalidas"));
             }
 
-            String token = tokenService.gerarToken(psicologo.getEmail());
+            String token = tokenService.gerarToken(psicologo.getEmail(), "PSICOLOGO");
             return new TokenResponseDTO(
                     psicologo.getNome(),
                     psicologo.getEmail(),
