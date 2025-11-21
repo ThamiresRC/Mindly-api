@@ -2,7 +2,7 @@
 INSERT INTO pacientes (nome, email, senha, telefone, observacao)
 VALUES ('Paciente Exemplo', 'exemplo@mindly.com', '123456', '11900000000', 'Paciente cadastrado para testes.');
 
--- ===================== PSICÓLOGO (exemplo único) =====================
+-- ===================== PSICÓLOGO (exemplo único / admin) =====================
 INSERT INTO psicologos (nome, email, senha, telefone)
 VALUES ('Administrador', 'admin@mindly.com', '123456', '11900000000');
 

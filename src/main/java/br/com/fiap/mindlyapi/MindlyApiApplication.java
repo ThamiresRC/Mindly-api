@@ -5,7 +5,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.info.Contact;
-import io.swagger.v3.oas.annotations.servers.Server;
 
 @SpringBootApplication
 @OpenAPIDefinition(
@@ -17,13 +16,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
                         name = "Mindly Team",
                         email = "mindly@fiap.com"
                 )
-        ),
-        servers = {
-                @Server(
-                        url = "http://localhost:8080",
-                        description = "Servidor local"
-                )
-        }
+        )
 )
 public class MindlyApiApplication {
 
