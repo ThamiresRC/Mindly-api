@@ -87,7 +87,7 @@ Quando detectado:
 | Ambiente | URL | Observações |
 |----------|-----|-------------|
 | **Local** | https://mindly-api.onrender.com/swagger-ui.html | Desenvolvimento |
-| **Produção (opcional)** | Render / Railway | Pode ser publicado facilmente |
+
 
 ---
 
