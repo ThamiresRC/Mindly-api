@@ -32,6 +32,8 @@ A aplicação permite que pacientes registrem emoções, hábitos e rotinas enqu
 | **Docker** | Containerização |
 | **React Native** | Aplicativo mobile |
 
+> **Observação:** RabbitMQ fica **desativado no Render**, mas o sistema de alertas continua funcionando via endpoint consolidado.
+
 ---
 
 ## 🤖 IA Generativa Integrada (Spring AI + Groq)
@@ -74,14 +76,17 @@ Dispara alerta quando:
 - Palavras de risco são identificadas.
 - Estresse muito elevado.
 
-Alertas são enviados para filas **RabbitMQ**.
+Quando detectado:
+- Um **alerta é gerado** para o psicólogo.
+- O app exibe um **badge vermelho** ao lado do paciente.
+- A API registra o alerta internamente (mesmo sem RabbitMQ no Render).
 
 ---
 
 ## ☁️ Deploy e Ambientes
 | Ambiente | URL | Observações |
 |----------|-----|-------------|
-| **Local** | http://localhost:8080/swagger-ui.html | Desenvolvimento |
+| **Local** | https://mindly-api.onrender.com/swagger-ui.html | Desenvolvimento |
 | **Produção (opcional)** | Render / Railway | Pode ser publicado facilmente |
 
 ---
@@ -127,6 +132,12 @@ mindly-api/
 
 ### 🤖 Inteligência Artificial
 - POST `/api/ia/sugestoes`
+
+---
+
+Acesso:
+- Swagger → http://localhost:8080/swagger-ui.html
+- H2 Console → http://localhost:8080/h2-console
 
 ---
 
